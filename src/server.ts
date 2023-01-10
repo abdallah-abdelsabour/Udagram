@@ -30,23 +30,28 @@ import { Request, Response } from "express";
 
   app.get("/filteredimage", async (req: Request, res: Response) => {
     if (!req.query.image_url) {
-      res.send("url not correct please try again  ");
+      res.status(422).send("img url didnt provided please try again ");
       return;
     }
-    const imgLink = req.query.image_url;
-    const filtertImg = await filterImageFromURL(imgLink);
-    res.status(200).sendFile(filtertImg, () => {
-      console.log("success");
-      deleteLocalFiles([filtertImg]);
-    });
+    try {
+      const imgLink: string = req.query.image_url;
+      const filtertImg: string = await filterImageFromURL(imgLink);
+      res.status(200).sendFile(filtertImg, () => {
+        console.log("success");
+        deleteLocalFiles([filtertImg]);
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(500).send(" url not valid");
+    }
   });
   //! END @TODO1
 
   // Root Endpoint
   // Displays a simple message to the user
 
-  app.get("/", async (req, res) => {
-    res.send("try GET /filteredimage?image_url={{}}");
+  app.get("/", async (req: Request, res: Response) => {
+    res.status(201).send("try GET /filteredimage?image_url={{}}");
   });
 
   // Start the Server
